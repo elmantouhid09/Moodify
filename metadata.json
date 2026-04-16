@@ -1,0 +1,6 @@
+{
+  "name": "Moodify",
+  "description": "A mood-based music recommender powered by Spotify and Gemini. Connect your Spotify account, pick your vibe, and get personalized playlist recommendations in a stunning cyberpunk interface.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
