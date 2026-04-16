@@ -607,11 +607,17 @@
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
             
-            if (response.status === 401) {
-                localStorage.removeItem('spotify_access_token');
-                showToast("Session expired. Logging out...");
-                setTimeout(() => location.reload(), 2000);
-                return null;
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error("Spotify API Error:", response.status, errorData);
+                
+                if (response.status === 401) {
+                    localStorage.removeItem('spotify_access_token');
+                    showToast("Session expired. Logging out...");
+                    setTimeout(() => location.reload(), 2000);
+                    return null;
+                }
+                throw new Error(errorData.error?.message || "Failed to fetch playlists");
             }
             
             return response.json();
@@ -721,7 +727,13 @@
                 const data = await fetchPlaylists(token, selectedMood);
                 if (!data) return;
 
-                document.getElementById('result-mood-name').innerText = selectedMood.toUpperCase() + " PLAYLISTS";
+                console.log("Data fetched:", data);
+
+                if (!data.playlists || !data.playlists.items || data.playlists.items.length === 0) {
+                    showToast("No playlists found for this mood.");
+                    showSection('moods');
+                    return;
+                }
                 const container = document.getElementById('playlists-container');
                 container.innerHTML = '';
 
