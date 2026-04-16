@@ -488,7 +488,7 @@
                 <div class="mood-card" data-mood="party" style="--mood-color: #ffd700; --mood-color-low: rgba(255, 215, 0, 0.2); --mood-color-mid: rgba(255, 215, 0, 0.4);">
                     <i data-lucide="party-popper" style="color: #ffd700"></i>
                     <span class="font-orbitron">PARTY</span>
-                    <i data-lucide="check-circle-check" class="selected-indicator"></i>
+                    <i data-lucide="check-circle-2" class="selected-indicator"></i>
                 </div>
             </div>
             <button id="btn-fetch" class="btn" disabled style="opacity: 0.5; cursor: not-allowed;">ANALYZE FREQUENCIES</button>
@@ -734,6 +734,8 @@
                     showSection('moods');
                     return;
                 }
+
+                document.getElementById('result-mood-name').innerText = selectedMood.toUpperCase() + " PLAYLISTS";
                 const container = document.getElementById('playlists-container');
                 container.innerHTML = '';
 
@@ -755,7 +757,8 @@
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('results-content').style.display = 'block';
             } catch (err) {
-                showToast("Data extraction failed. Neural link severed.");
+                console.error("App Processing Error:", err);
+                showToast(`Data extraction failed: ${err.message || 'Unknown error'}`);
                 showSection('moods');
             }
         });
