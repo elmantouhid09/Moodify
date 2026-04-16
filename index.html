@@ -741,14 +741,22 @@
 
                 data.playlists.items.forEach(playlist => {
                     if (!playlist) return;
+                    
+                    // Safe access to playlist properties
+                    const name = playlist.name || 'Unknown Playlist';
+                    const tracksTotal = playlist.tracks?.total || 0;
+                    const ownerName = playlist.owner?.display_name || 'Spotify User';
+                    const imageUrl = playlist.images && playlist.images.length > 0 ? playlist.images[0].url : 'https://picsum.photos/seed/music/300/300';
+                    const spotifyUrl = playlist.external_urls?.spotify || '#';
+
                     const card = document.createElement('div');
                     card.className = 'playlist-card';
                     card.innerHTML = `
-                        <img src="${playlist.images[0]?.url || 'https://via.placeholder.com/300'}" class="playlist-img" alt="${playlist.name}">
+                        <img src="${imageUrl}" class="playlist-img" alt="${name}" referrerPolicy="no-referrer">
                         <div class="playlist-info">
-                            <h3 class="playlist-name">${playlist.name}</h3>
-                            <p class="playlist-meta">${playlist.tracks.total} Tracks • By ${playlist.owner.display_name}</p>
-                            <a href="${playlist.external_urls.spotify}" target="_blank" class="btn" style="padding: 0.6rem 1.2rem; font-size: 0.8rem; display: block; text-align: center;">OPEN IN SPOTIFY</a>
+                            <h3 class="playlist-name">${name}</h3>
+                            <p class="playlist-meta">${tracksTotal} Tracks • By ${ownerName}</p>
+                            <a href="${spotifyUrl}" target="_blank" class="btn" style="padding: 0.6rem 1.2rem; font-size: 0.8rem; display: block; text-align: center;">OPEN IN SPOTIFY</a>
                         </div>
                     `;
                     container.appendChild(card);
