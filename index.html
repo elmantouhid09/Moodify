@@ -47,7 +47,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3column%3filter id='noiseFilter'%3column%3feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3column%3f/filter%3column%3rect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3column%3f/svg%3e");
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3e");
             opacity: 0.05;
             pointer-events: none;
             z-index: 999;
@@ -439,6 +439,7 @@
             </div>
             <h1 id="landing-header">MOODIFY</h1>
             <p class="hero-sub">Connect Spotify. Pick your mood. Let the music find you in the neon currents of the web.</p>
+            <div id="debug-info" style="font-size: 0.7rem; opacity: 0.4; margin-bottom: 2rem;"></div>
             <button id="btn-login" class="btn">CONNECT WITH SPOTIFY</button>
         </section>
 
@@ -537,7 +538,8 @@
         const CLIENT_ID = 'f1e5de8c33f949a8befbe696703a3e76'; 
         
         const REDIRECT_URI = window.location.origin + window.location.pathname; 
-       const SCOPES = 'playlist-read-public';
+        const SCOPES = 'playlist-read-private user-read-private';
+
         /** 
          * ==========================================
          * 2. SPOTIFY API & PKCE HELPERS
@@ -648,10 +650,25 @@
         // Initialize App
         async function init() {
             lucide.createIcons();
-            
-            // Check for OAuth callback
+            console.log("Moodify initialized. Checking context...");
+
+            // Display Redirect URI for debugging
+            document.getElementById('debug-info').innerText = `REDIRECT URI: ${REDIRECT_URI}`;
+
+            // If we are in an iframe, warn the user
+            if (window.self !== window.top) {
+                showToast("Note: Log-in may fail inside the preview iframe. Open in a new tab if it doesn't work.", "success");
+            }
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
+            const error = urlParams.get('error');
+
+            if (error) {
+                showToast(`Auth error: ${error.replace(/_/g, ' ')}`);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                showSection('landing');
+                return;
+            }
 
             if (code) {
                 // Exchange code for token
